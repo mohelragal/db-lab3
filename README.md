@@ -1,10 +1,9 @@
-# DB Lab 2 + Lab 3: Login & To-Do + Library (Books and Authors)
+DB LAB3 
 
 A small website with a MySQL database behind it:
 
-* **Lab 2**: sign-up, login, logout and a private to-do list for every user.
 * **Lab 3 – Problem 2**: a library with two tables, `AUTHOR` and `BOOK`: show, add, edit and remove books and authors.
-* **Bonus**: due dates, filters and search, an open-to-do counter, dark mode, automated tests (Lab 2), and image upload for book covers and author photos (Lab 3).
+* **Bonus**: image upload for book covers and author photos (Lab 3).
 
 ---
 
