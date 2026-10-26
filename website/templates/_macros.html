@@ -1,0 +1,7 @@
+{% macro field(name, label, errors, value='', type='text', attrs='') -%}
+<div class="field {{ 'has-error' if errors.get(name) }}">
+  <label for="{{ name }}">{{ label }}</label>
+  <input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}" {{ attrs|safe }}>
+  <p class="error" data-error-for="{{ name }}">{{ errors.get(name, '') }}</p>
+</div>
+{%- endmacro %}

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Library{% endblock %}
+{% block container_class %}wide{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head">
+    <h1>Books</h1>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('new_book') }}">+ Add book</a>
+  </div>
+  {% if books %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Cover</th><th>ID</th><th>Title</th><th class="num">Price</th><th>Author ID</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for b in books %}
+        <tr>
+          <td data-label="Cover">
+            {% if b.cover %}
+              <img class="thumb" src="{{ url_for('static', filename='uploads/books/' ~ b.cover) }}" alt="Cover of {{ b.title }}">
+            {% else %}
+              <span class="thumb placeholder" aria-hidden="true">📘</span>
+            {% endif %}
+          </td>
+          <td data-label="ID">{{ b.book_id }}</td>
+          <td data-label="Title"><strong>{{ b.title }}</strong></td>
+          <td data-label="Price" class="num">{{ '%.2f' % b.price }}</td>
+          <td data-label="Author ID"><span>{{ b.author_id }} <span class="muted">({{ author_names.get(b.author_id, '?') }})</span></span></td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('edit_book', book_id=b.book_id) }}">Edit</a>
+            <form method="post" action="{{ url_for('delete_book', book_id=b.book_id) }}" class="inline"
+                  data-confirm="Remove the book “{{ b.title }}”? Are you sure?">
+              <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty"><p><strong>No books yet.</strong></p>
+      <p class="muted">{{ 'Add a book to get started.' if authors else 'Add an author first, then their books.' }}</p></div>
+  {% endif %}
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h1>Authors</h1>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('new_author') }}">+ Add author</a>
+  </div>
+  {% if authors %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Photo</th><th>ID</th><th>Name</th><th>Country</th><th></th></tr>
+      </thead>
+      <tbody>
+      {% for a in authors %}
+        <tr>
+          <td data-label="Photo">
+            {% if a.photo %}
+              <img class="thumb round" src="{{ url_for('static', filename='uploads/authors/' ~ a.photo) }}" alt="Photo of {{ a.name }}">
+            {% else %}
+              <span class="thumb round placeholder" aria-hidden="true">👤</span>
+            {% endif %}
+          </td>
+          <td data-label="ID">{{ a.author_id }}</td>
+          <td data-label="Name"><strong>{{ a.name }}</strong></td>
+          <td data-label="Country">{{ a.country }}</td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('edit_author', author_id=a.author_id) }}">Edit</a>
+            <form method="post" action="{{ url_for('delete_author', author_id=a.author_id) }}" class="inline"
+                  data-confirm="Remove “{{ a.name }}”? ALL books of this author will be removed too. Are you sure?">
+              <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty"><p><strong>No authors yet.</strong></p><p class="muted">Add the first author.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

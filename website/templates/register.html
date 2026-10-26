@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}Register{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Create an account</h1>
+  <p class="muted">Sign up to keep your own private to-do list.</p>
+
+  <form method="post" action="{{ url_for('register') }}" novalidate data-validate="register">
+    {{ field('name', 'Name', errors, form.name, attrs='autocomplete="name"') }}
+    {{ field('email', 'E-mail', errors, form.email, type='email', attrs='autocomplete="email"') }}
+    {{ field('password', 'Password', errors, type='password', attrs='autocomplete="new-password"') }}
+    {{ field('confirm_password', 'Confirm password', errors, type='password', attrs='autocomplete="new-password"') }}
+    <button class="btn btn-primary btn-block" type="submit">Register</button>
+  </form>
+
+  <p class="switch">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+</section>
+{% endblock %}

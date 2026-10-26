@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}My list{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head">
+    <h1>To-Do</h1>
+
+    <span class="badge" title="Open to-dos">{{ counts.open_count }} open · {{ counts.total }} total</span>
+  </div>
+
+  <form method="post" action="{{ url_for('add_todo') }}" class="add-form" novalidate data-validate="todo">
+    <div class="field grow {{ 'has-error' if errors.add_title }}">
+      <label for="add-title" class="sr-only">What needs to be done?</label>
+      <input id="add-title" name="title" type="text" placeholder="What needs to be done?"
+             value="{{ add_form.get('title', '') }}" data-rule="title">
+      <p class="error" data-error-for="title">{{ errors.get('add_title', '') }}</p>
+    </div>
+    <div class="field {{ 'has-error' if errors.add_due }}">
+      <label for="add-due" class="sr-only">Due date (optional)</label>
+      <input id="add-due" name="due_date" type="date" value="{{ add_form.get('due_date', '') }}" title="Due date (optional)">
+      <p class="error">{{ errors.get('add_due', '') }}</p>
+    </div>
+    <button class="btn btn-primary" type="submit">Add</button>
+  </form>
+
+  <form method="get" action="{{ url_for('todos') }}" class="toolbar">
+    <div class="tabs" role="tablist">
+      {% for key, label in [('all', 'All'), ('open', 'Open'), ('done', 'Done')] %}
+        <a role="tab" class="tab {{ 'active' if show == key }}"
+           href="{{ url_for('todos', show=key, q=search or None) }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    <input type="hidden" name="show" value="{{ show }}">
+    <input type="search" name="q" value="{{ search }}" placeholder="Search…" aria-label="Search to-dos">
+    <button class="btn btn-ghost btn-sm" type="submit">Search</button>
+  </form>
+
+  {% if items %}
+  <ul class="todo-list">
+    {% for t in items %}
+    {% set overdue = t.due_date and not t.is_done and t.due_date < today %}
+    <li class="todo {{ 'done' if t.is_done }} {{ 'overdue' if overdue }}">
+      <form method="post" action="{{ url_for('mark_todo', todo_id=t.todo_id) }}" class="inline">
+        <input type="hidden" name="is_done" value="{{ 0 if t.is_done else 1 }}">
+        <button class="check" type="submit"
+                title="{{ 'Mark as not done' if t.is_done else 'Mark as done' }}"
+                aria-label="{{ 'Mark as not done' if t.is_done else 'Mark as done' }}">{{ '✓' if t.is_done else '' }}</button>
+      </form>
+
+      <form method="post" action="{{ url_for('edit_todo', todo_id=t.todo_id) }}" class="edit-form" novalidate data-validate="todo">
+        <div class="field grow {{ 'has-error' if errors.get('edit_' ~ t.todo_id) }}">
+          <input name="title" type="text" value="{{ t.title }}" aria-label="Title" data-rule="title">
+          <p class="error" data-error-for="title">{{ errors.get('edit_' ~ t.todo_id, '') }}</p>
+        </div>
+        <input name="due_date" type="date" value="{{ t.due_date or '' }}" aria-label="Due date" title="Due date">
+        <button class="btn btn-ghost btn-sm" type="submit">Save</button>
+      </form>
+
+      <form method="post" action="{{ url_for('delete_todo', todo_id=t.todo_id) }}" class="inline"
+            data-confirm="Delete “{{ t.title }}”? Are you sure?">
+        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
+      </form>
+
+      <div class="meta">
+        Added {{ t.created_at.strftime('%d %b %Y, %H:%M') }}
+        {% if t.due_date %} · <span class="due">{{ 'Overdue: ' if overdue else 'Due ' }}{{ t.due_date.strftime('%d %b %Y') }}</span>{% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% elif search or show != 'all' %}
+    <div class="empty">
+      <p>No to-dos match this filter.</p>
+      <a href="{{ url_for('todos') }}">Show all</a>
+    </div>
+  {% else %}
+    <div class="empty">
+      <div class="empty-icon">🌱</div>
+      <p><strong>Your list is empty.</strong></p>
+      <p class="muted">Add your first to-do above and get going!</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

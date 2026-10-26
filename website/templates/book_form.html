@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}{{ 'Edit book' if book else 'Add book' }}{% endblock %}
+{% block container_class %}narrow{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ 'Edit book #' ~ book.book_id if book else 'Add a book' }}</h1>
+
+  {% if not authors %}
+    <div class="empty">
+      <p><strong>There are no authors yet.</strong></p>
+      <p class="muted">Every book needs an author (foreign key). Add an author first.</p>
+      <a class="btn btn-primary" href="{{ url_for('new_author') }}">+ Add author</a>
+    </div>
+  {% else %}
+  <form method="post" enctype="multipart/form-data" novalidate data-validate="book">
+    {{ field('title', 'Title', errors, form.title, attrs='maxlength="200" data-rule="title"') }}
+    {{ field('price', 'Price', errors, form.price, type='number', attrs='step="0.01" min="0" data-rule="price"') }}
+
+    <div class="field {{ 'has-error' if errors.author_id }}">
+      <label for="author_id">Author</label>
+      <select id="author_id" name="author_id">
+        <option value="">— choose an author —</option>
+        {% for a in authors %}
+          <option value="{{ a.author_id }}" {{ 'selected' if form.author_id == a.author_id|string }}>
+            {{ a.author_id }} · {{ a.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <p class="error" data-error-for="author_id">{{ errors.get('author_id', '') }}</p>
+    </div>
+
+    <div class="field {{ 'has-error' if errors.cover }}">
+      <label for="cover">Cover <span class="muted">(optional, PNG / JPG / GIF / WEBP, 2 MB max)</span></label>
+      {% if book and book.cover %}
+        <div class="current-image">
+          <img class="thumb" src="{{ url_for('static', filename='uploads/books/' ~ book.cover) }}" alt="Current cover">
+          <label class="check-label"><input type="checkbox" name="remove_cover" value="1"> Remove this cover</label>
+        </div>
+      {% endif %}
+      <input id="cover" name="cover" type="file" accept="image/png,image/jpeg,image/gif,image/webp" data-rule="image">
+      <img class="preview" alt="" hidden>
+      <p class="error" data-error-for="cover">{{ errors.get('cover', '') }}</p>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="{{ url_for('library') }}">Cancel</a>
+      <button class="btn btn-primary" type="submit">{{ 'Save' if book else 'Add book' }}</button>
+    </div>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
